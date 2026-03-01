@@ -1,0 +1,27 @@
+# Dockerfile.dev
+# Use the official Ruby image (update the version to match what is in your Gemfile!)
+FROM ruby:4.0.1
+
+# Install system dependencies needed to build gems (like the 'pg' gem)
+RUN apt-get update -qq && \
+    apt-get install -y build-essential libpq-dev nodejs
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy your Gemfile and install gems BEFORE copying the rest of the app
+# (This makes Docker build much faster if you only change your Ruby code, not your gems)
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+# We need foreman installed globally inside the container for bin/dev
+RUN gem install foreman
+
+# Copy the rest of your application code
+COPY . .
+
+# Expose port 3000 so we can access it from our browser
+EXPOSE 3000
+
+# The command to start the server (your Tailwind/Rails hybrid command)
+CMD ["bin/dev"]

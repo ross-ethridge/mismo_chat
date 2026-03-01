@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    # This mounts your local code into the container so you don't have to 
+    # rebuild the container every time you change a Ruby file!
+    volumes:
+      - .:/app
+    # Tells Docker to pass your .env file into the container
+    env_file:
+      - .env
+    # Override the DB_HOST to point to the Postgres container
+    environment:
+      - DB_HOST=db
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
