@@ -7,7 +7,9 @@ A Rails chat app that talks to Google Gemini or Anthropic Claude, with a local S
 - Ruby on Rails 8.1
 - PostgreSQL
 - Google Gemini 2.5 Flash API (chat)
+  - ```https://aistudio.google.com/```
 - Anthropic Claude API — Sonnet 4.6 or Opus 4.6 (chat)
+  - ```https://platform.claude.com/dashboard```
 - Stable Diffusion 1.5 via local FastAPI/PyTorch service (image generation)
 - Docker / Docker Compose
 
