@@ -6,7 +6,7 @@ A Rails chat app that talks to Google Gemini or Anthropic Claude, with a local S
 
 - Ruby on Rails 8.1
 - PostgreSQL
-- Google Gemini 2.5 Flash API (chat)
+- Google Gemini 3.1 Flash Lite Preview API (chat)
   - ```https://aistudio.google.com/```
 - Anthropic Claude API — Sonnet 4.6 or Opus 4.6 (chat)
   - ```https://platform.claude.com/dashboard```
@@ -58,49 +58,62 @@ Generate a secret key base with:
 openssl rand -hex 64
 ```
 
-**2. Build all images:**
+**2. Build and start everything:**
 
 ```bash
-docker compose -f docker-compose.prod.yaml build
+docker compose up --build -d
 ```
 
-**3. Create the database:**
+This will:
+- Build the Rails web container and the Stable Diffusion container
+- Start PostgreSQL, the Rails app on port 3000, and the SD service on port 8000
+- Run database migrations automatically on startup
+- Compile Tailwind CSS
+
+**3. Wait for Stable Diffusion to be ready:**
+
+On first run, the SD service downloads the model weights (~4GB from HuggingFace):
 
 ```bash
-docker compose -f docker-compose.prod.yaml run --rm web bin/rails db:prepare
-```
-
-**4. Start the app:**
-
-```bash
-docker compose -f docker-compose.prod.yaml up -d
-```
-
-The app runs on `http://localhost`. The Stable Diffusion service starts on port 8000 and will download the model (~4GB) on first run — check its progress with:
-
-```bash
-docker compose -f docker-compose.prod.yaml logs -f sd
+docker compose logs -f sd
 ```
 
 Wait for `Uvicorn running on http://0.0.0.0:8000` before trying to generate images.
 
-## Features
+The app is available at `http://localhost:3000`.
+
+## Usage
 
 ### Chat
-Talk to Google Gemini 2.5 Flash or Anthropic Claude. The full conversation history is sent with each request so the model has context.
 
-Use the toggle in the chat header to switch providers at any time — your choice is remembered for the session.
+Talk to Google Gemini or Anthropic Claude. The full conversation history is sent with each request so the model has context. Type your message in the input box — it supports multiple lines (Enter for new line) and auto-resizes as you type. Click the send button to submit.
 
-**Gemini** runs on the [free tier of Google AI Studio](https://aistudio.google.com/) — no billing setup required.
+Use the toggle in the chat header to switch between Gemini and Claude at any time.
 
-**Claude** requires an [Anthropic API key](https://console.anthropic.com/) and offers two model options selectable from the header:
+**Gemini** runs on the [free tier of Google AI Studio](https://aistudio.google.com/) — no billing required. Uses `gemini-3.1-flash-lite-preview`.
+
+**Claude** requires an [Anthropic API key](https://console.anthropic.com/) and offers two model options:
 - **Sonnet 4.6** — fast and capable (default)
 - **Opus 4.6** — most capable, slower
 
 ### Conversations
+
 Each chat is saved as a named conversation. The sidebar lists all past conversations; click any to resume it, or use **+ New Chat** to start fresh. Conversations are auto-titled from the first message and can be deleted individually.
 
 ### Image Generation
-Click **Generate Image** from the chat header to open the image generator. Enter a prompt, click **Generate & Download**, and the image will be rendered locally by Stable Diffusion 1.5 on your GPU and displayed in the browser. A download link is provided below the image.
+
+Click **Generate Image** from the chat header to open the image generator. Enter a prompt, click **Generate & Download**, and the image will be rendered locally by Stable Diffusion 1.5 on your GPU.
+
+All images are automatically styled as vintage polaroid photos — faded colors, film grain, white border, and soft focus.
 
 Images are generated entirely on your machine — nothing is sent to any external image API.
+
+## Rebuilding after code changes
+
+CSS changes require a manual rebuild inside the container:
+
+```bash
+docker compose exec web bin/rails tailwindcss:build
+```
+
+For all other changes (Ruby, ERB, etc.), Rails reloads automatically in development — no restart needed.
