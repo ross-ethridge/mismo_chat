@@ -21,12 +21,18 @@ class PromptRequest(BaseModel):
     prompt: str
 
 
+POLAROID_SUFFIX = (
+    ", polaroid photo, instant film, faded colors, slight vignette, "
+    "white border, film grain, vintage, overexposed, soft focus, retro"
+)
+
 @app.post("/generate")
 def generate(req: PromptRequest):
     if not req.prompt.strip():
         raise HTTPException(status_code=400, detail="Prompt cannot be empty")
 
-    image = pipe(req.prompt, num_inference_steps=30).images[0]
+    prompt = req.prompt.strip() + POLAROID_SUFFIX
+    image = pipe(prompt, num_inference_steps=30).images[0]
 
     buf = io.BytesIO()
     image.save(buf, format="PNG")

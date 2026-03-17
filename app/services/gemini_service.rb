@@ -5,8 +5,8 @@ require 'json'
 
 class GeminiService
   MODELS = {
-    'flash' => 'gemini-2.5-flash',
-    'pro'   => 'gemini-3.1-pro'
+    'flash' => 'gemini-3.1-flash-lite-preview',
+    'pro'   => 'gemini-3.1-pro-preview'
   }.freeze
 
   def initialize(model: 'flash')

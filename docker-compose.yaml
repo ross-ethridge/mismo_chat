@@ -11,6 +11,20 @@ services:
     ports:
       - "5432:5432"
 
+  sd:
+    build:
+      context: ./sd
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
   web:
     build:
       context: .
@@ -29,6 +43,7 @@ services:
       - DB_HOST=db
     depends_on:
       - db
+      - sd
 
 volumes:
   postgres_data:

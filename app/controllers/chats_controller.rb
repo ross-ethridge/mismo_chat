@@ -6,7 +6,8 @@ class ChatsController < ApplicationController
     @conversations = Conversation.order(created_at: :desc)
     @ai_model     = session[:ai_model]     || 'gemini'
     @claude_model = session[:claude_model] || 'sonnet'
-    @gemini_model = session[:gemini_model] || 'flash'
+    @gemini_model = 'flash'
+    session[:gemini_model] = 'flash'
   end
 
   def create
@@ -24,7 +25,7 @@ class ChatsController < ApplicationController
     service = if session[:ai_model] == 'claude'
                 ClaudeService.new(model: session[:claude_model] || 'sonnet')
               else
-                GeminiService.new(model: session[:gemini_model] || 'flash')
+                GeminiService.new(model: 'flash')
               end
     ai_response = service.call(history)
 
