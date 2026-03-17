@@ -1,4 +1,4 @@
-# Chingadero Chat
+# Mismo Chat
 
 A Rails chat app that talks to Google Gemini or Anthropic Claude, with a local Stable Diffusion image generator running on your GPU.
 
@@ -48,7 +48,7 @@ sudo service docker restart
 GEMINI_API_KEY=your_gemini_api_key
 ANTHROPIC_API_KEY=your_anthropic_api_key   # optional — only needed for Claude
 HF_TOKEN=your_huggingface_token
-POSTGRES_USER=chingadero_chat
+POSTGRES_USER=mismo_chat
 POSTGRES_PASSWORD=your_password_here
 SECRET_KEY_BASE=your_secret_key_base_here
 ```

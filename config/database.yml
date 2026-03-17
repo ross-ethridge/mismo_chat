@@ -17,16 +17,16 @@ test:
 production:
   primary:
     <<: *default
-    database: chingadero_chat_production
+    database: mismo_chat_production
   cable:
     <<: *default
-    database: chingadero_chat_cable_production
+    database: mismo_chat_cable_production
     migrations_paths: db/cable_migrate
   queue:
     <<: *default
-    database: chingadero_chat_queue_production
+    database: mismo_chat_queue_production
     migrations_paths: db/queue_migrate
   cache:
     <<: *default
-    database: chingadero_chat_cache_production
+    database: mismo_chat_cache_production
     migrations_paths: db/cache_migrate
