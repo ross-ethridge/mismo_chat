@@ -33,7 +33,7 @@
     <!-- Header -->
     <header class="bg-zinc-800 px-6 py-4 border-b border-zinc-700 flex items-center flex-wrap gap-3">
       <div class="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden shadow-sm">
-        <img src="/bike_crank.png" class="w-full h-full object-cover" alt="crank">
+        <img src="/nyc_skyline.png" class="w-full h-full object-cover" alt="nyc">
       </div>
       <h2 class="m-0 text-lg font-semibold text-zinc-100 truncate">
         <%= @conversation.title.present? ? @conversation.title : "New conversation" %>
@@ -75,7 +75,7 @@
       <!-- Generate Image: David bust icon -->
       <%= link_to new_image_path, class: "flex items-center gap-1.5 text-sm text-zinc-300 hover:text-zinc-100" do %>
         <div class="w-8 h-8 rounded-full overflow-hidden shadow-sm flex-shrink-0">
-          <img src="/cat_bike.png" class="w-full h-full object-cover" alt="cat on bike">
+          <img src="/nyc_street.png" class="w-full h-full object-cover" alt="nyc street">
         </div>
         Generate Image
       <% end %>
@@ -94,7 +94,7 @@
 
           <% if msg.role == 'model' %>
             <div class="w-8 h-8 rounded-full flex-shrink-0 overflow-hidden shadow-sm">
-              <img src="/bike_crank.png" class="w-full h-full object-cover" alt="crank">
+              <img src="/nyc_skyline.png" class="w-full h-full object-cover" alt="nyc">
             </div>
           <% end %>
 
