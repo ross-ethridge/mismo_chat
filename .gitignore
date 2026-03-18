@@ -28,7 +28,7 @@
 !/tmp/storage/
 !/tmp/storage/.keep
 
-/public/assets
+/public/*
 
 # Ignore key files for decrypting credentials and more.
 /config/*.key

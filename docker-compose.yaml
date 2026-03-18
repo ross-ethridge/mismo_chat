@@ -17,6 +17,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    volumes:
+      - ./sd/app.py:/app/app.py
+      - hf_cache:/root/.cache/huggingface
     deploy:
       resources:
         reservations:
@@ -47,3 +50,4 @@ services:
 
 volumes:
   postgres_data:
+  hf_cache:
