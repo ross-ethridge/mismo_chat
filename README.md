@@ -2,6 +2,9 @@
 
 A Rails chat app that talks to Google Gemini or Anthropic Claude, with a local Stable Diffusion image generator running on your GPU.
 
+![Chat](docs/screenshots/conversation.png)
+![Image Generator](docs/screenshots/imageGenerator.png)
+
 ## Stack
 
 - Ruby on Rails 8.1
