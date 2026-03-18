@@ -1,4 +1,5 @@
 import io
+import threading
 import torch
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response
@@ -6,6 +7,7 @@ from pydantic import BaseModel
 from diffusers import StableDiffusionPipeline
 
 app = FastAPI()
+pipe_lock = threading.Lock()
 
 print("Loading model...")
 pipe = StableDiffusionPipeline.from_pretrained(
@@ -33,7 +35,8 @@ def generate(req: PromptRequest):
         raise HTTPException(status_code=400, detail="Prompt cannot be empty")
 
     prompt = req.prompt.strip() if req.raw else req.prompt.strip() + POLAROID_SUFFIX
-    image = pipe(prompt, num_inference_steps=30).images[0]
+    with pipe_lock:
+        image = pipe(prompt, num_inference_steps=30).images[0]
 
     buf = io.BytesIO()
     image.save(buf, format="PNG")
