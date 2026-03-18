@@ -3,10 +3,10 @@
   <!-- Header -->
   <header class="bg-zinc-800 px-6 py-4 border-b border-zinc-700 flex items-center gap-3">
     <div class="bg-gradient-to-br from-blue-400 to-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-sm overflow-hidden">
-      <img src="/cat_bike.png" class="w-10 h-10 object-contain invert" alt="cat on bike">
+      <img src="/cat_bike.png" class="w-full h-full object-cover invert" alt="cat on bike">
     </div>
     <h2 class="m-0 text-xl font-semibold text-zinc-100">Image Generator</h2>
-    <%= link_to "← Back to Chat", chats_path, class: "ml-auto text-sm text-blue-400 hover:text-blue-300" %>
+    <%= link_to "← Back to Chat", chats_path, class: "ml-auto text-sm text-zinc-300 hover:text-zinc-100" %>
   </header>
 
   <div class="p-8 bg-zinc-900">
@@ -28,14 +28,14 @@
               autofocus: true %>
 
         <%= f.submit "Generate & Download",
-              class: "self-end bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-full transition-colors cursor-pointer" %>
+              class: "self-end nyc-bg text-white font-semibold px-6 py-3 rounded-full transition-colors cursor-pointer" %>
       </div>
     <% end %>
 
     <% if @image_data %>
       <div class="mt-6">
         <img src="data:image/png;base64,<%= @image_data %>" class="w-full rounded-xl shadow-md" alt="<%= @prompt %>" />
-        <a href="data:image/png;base64,<%= @image_data %>" download="<%= @filename %>" class="mt-3 inline-block text-sm text-blue-400 hover:text-blue-300">Download image</a>
+        <a href="data:image/png;base64,<%= @image_data %>" download="<%= @filename %>" class="mt-3 inline-block text-sm text-zinc-300 hover:text-zinc-100">Download image</a>
       </div>
     <% end %>
   </div>

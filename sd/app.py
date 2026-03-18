@@ -19,6 +19,7 @@ print("Model ready.")
 
 class PromptRequest(BaseModel):
     prompt: str
+    raw: bool = False
 
 
 POLAROID_SUFFIX = (
@@ -31,7 +32,7 @@ def generate(req: PromptRequest):
     if not req.prompt.strip():
         raise HTTPException(status_code=400, detail="Prompt cannot be empty")
 
-    prompt = req.prompt.strip() + POLAROID_SUFFIX
+    prompt = req.prompt.strip() if req.raw else req.prompt.strip() + POLAROID_SUFFIX
     image = pipe(prompt, num_inference_steps=30).images[0]
 
     buf = io.BytesIO()
