@@ -29,12 +29,29 @@ class ChatsController < ApplicationController
               end
     ai_response = service.call(history)
 
-    Message.create!(role: 'model', content: ai_response, conversation: @conversation)
+    if (image_prompt = extract_image_prompt(ai_response))
+      begin
+        image_bytes = ImagenService.new.call(image_prompt)
+        image_data  = Base64.strict_encode64(image_bytes)
+        Message.create!(role: 'model', content: "[Image: #{image_prompt}]", image_data: image_data, conversation: @conversation)
+      rescue => e
+        Message.create!(role: 'model', content: "I tried to generate an image but the image service returned an error: #{e.message}", conversation: @conversation)
+      end
+    else
+      Message.create!(role: 'model', content: ai_response, conversation: @conversation)
+    end
 
     redirect_to chats_path
   end
 
   private
+
+  def extract_image_prompt(response)
+    parsed = JSON.parse(response.to_s.strip)
+    parsed['image_prompt'] if parsed.is_a?(Hash) && parsed.key?('image_prompt')
+  rescue JSON::ParserError
+    nil
+  end
 
   def set_conversation
     if params[:conversation_id].present?

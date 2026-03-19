@@ -71,14 +71,6 @@
           <% end %>
         </div>
       </div>
-
-      <!-- Generate Image: David bust icon -->
-      <%= link_to new_image_path, class: "flex items-center gap-1.5 text-sm text-zinc-300 hover:text-zinc-100" do %>
-        <div class="w-8 h-8 rounded-full overflow-hidden shadow-sm flex-shrink-0">
-          <img src="/nyc_street.png" class="w-full h-full object-cover" alt="nyc street">
-        </div>
-        Generate Image
-      <% end %>
     </header>
 
     <!-- Chat History -->
@@ -98,9 +90,24 @@
             </div>
           <% end %>
 
-          <div class="max-w-[80%] px-4 py-3 text-[15px] leading-relaxed <%= msg.role == 'user' ? 'nyc-bg text-white rounded-2xl rounded-br-sm shadow-md' : 'bg-zinc-700 text-zinc-100 rounded-2xl rounded-bl-sm border border-zinc-600 shadow-sm' %>">
-            <%= simple_format(msg.content, class: "mb-0 [&>p]:mb-2[&>p:last-child]:mb-0") %>
-          </div>
+          <% if msg.image_data.present? %>
+            <div class="max-w-[70%] flex flex-col gap-2">
+              <img src="data:image/png;base64,<%= msg.image_data %>" class="rounded-2xl shadow-md w-full" alt="generated image" />
+              <a href="data:image/png;base64,<%= msg.image_data %>"
+                 download="image_<%= msg.id %>.png"
+                 class="text-xs text-zinc-400 hover:text-zinc-200 text-center">
+                Download
+              </a>
+            </div>
+          <% else %>
+            <div class="max-w-[80%] px-4 py-3 text-[15px] leading-relaxed <%= msg.role == 'user' ? 'nyc-bg text-white rounded-2xl rounded-br-sm shadow-md' : 'bg-zinc-700 text-zinc-100 rounded-2xl rounded-bl-sm border border-zinc-600 shadow-sm prose-chat' %>">
+              <% if msg.role == 'user' %>
+                <%= simple_format(msg.content) %>
+              <% else %>
+                <%= render_markdown(msg.content) %>
+              <% end %>
+            </div>
+          <% end %>
 
         </div>
       <% end %>
@@ -118,7 +125,7 @@
           end
         %>
         <%= f.text_area :content,
-                        placeholder: "Message #{placeholder_name}...",
+                        placeholder: "Message #{placeholder_name}... (ask it to generate an image!)",
                         class: "flex-grow bg-transparent border-none focus:ring-0 text-zinc-100 placeholder-zinc-400 px-4 py-2 outline-none resize-none overflow-hidden",
                         required: true,
                         autocomplete: 'off',
