@@ -1,18 +1,15 @@
 # Mismo Chat
 
-A Rails chat app that talks to Google Gemini or Anthropic Claude, with a local Stable Diffusion image generator running on your GPU.
+A Rails chat app tuned for software engineering and DevOps questions, with support for Google Gemini and Anthropic Claude, and a local Stable Diffusion image generator running on your GPU.
 
-![Chat](docs/screenshots/conversation.png)
-![Image Generator](docs/screenshots/imageGenerator.png)
+![Chat](docs/screenshots/chat.png)
 
 ## Stack
 
 - Ruby on Rails 8.1
 - PostgreSQL
 - Google Gemini 3.1 Flash Lite Preview API (chat)
-  - https://aistudio.google.com/
 - Anthropic Claude API — Sonnet 4.6 or Opus 4.6 (chat)
-  - https://console.anthropic.com/
 - Stable Diffusion 1.5 via local FastAPI/PyTorch service (image generation)
 - Docker / Docker Compose
 
@@ -89,7 +86,9 @@ The app is available at `http://localhost:3000`.
 
 ### Chat
 
-Talk to Google Gemini or Anthropic Claude. The full conversation history is sent with each request so the model has context. Type your message in the input box — it supports multiple lines (Enter for new line) and auto-resizes as you type. Click the send button to submit.
+Talk to Google Gemini or Anthropic Claude. Both models are configured as a senior software engineer and DevOps specialist with a focus on Kubernetes, RKE2, cloud-native infrastructure, and multi-language development. They cite official documentation sources and give production-grade answers rather than toy examples.
+
+The full conversation history is sent with each request so the model has context. Type your message in the input box — it supports multiple lines (Enter for new line) and auto-resizes as you type.
 
 Use the toggle in the chat header to switch between Gemini and Claude at any time.
 
@@ -103,13 +102,19 @@ Use the toggle in the chat header to switch between Gemini and Claude at any tim
 
 Each chat is saved as a named conversation. The sidebar lists all past conversations; click any to resume it, or use **+ New Chat** to start fresh. Conversations are auto-titled from the first message and can be deleted individually.
 
-### Image Generation
+### Inline image generation from chat
 
-Click **Generate Image** from the chat header to open the image generator. Enter a prompt, click **Generate & Download**, and the image will be rendered locally by Stable Diffusion 1.5 on your GPU.
+You can ask either model to generate an image directly in the chat (e.g. "draw me a sunset over the ocean"). The model returns a structured image prompt, which is automatically sent to the local Stable Diffusion service. The resulting image appears inline in the conversation — nothing is sent to any external image API.
 
-All images are automatically styled as vintage polaroid photos — faded colors, film grain, white border, and soft focus.
+Images generated from chat are automatically styled as vintage polaroid photos — faded colors, film grain, white border, and soft focus.
 
-Images are generated entirely on your machine — nothing is sent to any external image API.
+### Standalone image generator
+
+Click **Generate Image** from the chat header to open the dedicated image generator.
+
+Enter a short description of what you want. You can optionally click **AI Enhance** to have Claude (or Gemini, matching your current chat toggle) rewrite your description into a detailed, optimized Stable Diffusion prompt before generating.
+
+Click **Generate & Download** to render the image locally on your GPU and download it.
 
 ## Rebuilding after code changes
 
