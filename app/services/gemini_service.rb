@@ -1,35 +1,35 @@
 # app/services/gemini_service.rb
-require 'net/http'
-require 'uri'
-require 'json'
+require "net/http"
+require "uri"
+require "json"
 
 class GeminiService
   MODELS = {
-    'flash' => 'gemini-3.1-flash-lite-preview',
-    'pro'   => 'gemini-3.1-pro-preview'
+    "flash" => "gemini-3.1-flash-lite-preview",
+    "pro"   => "gemini-3.1-pro-preview"
   }.freeze
 
-  def initialize(model: 'flash')
-    @model = MODELS.fetch(model, MODELS['flash'])
+  def initialize(model: "flash")
+    @model = MODELS.fetch(model, MODELS["flash"])
   end
 
   def call(messages)
     uri = URI("https://generativelanguage.googleapis.com/v1beta/models/#{@model}:generateContent?key=#{ENV['GEMINI_API_KEY']}")
-    
+
     # Format the database messages into the JSON schema Google Studio expects
     formatted_contents = messages.map do |msg|
       {
         role: msg.role, # 'user' or 'model'
-        parts:[{ text: msg.content }]
+        parts: [ { text: msg.content } ]
       }
     end
 
     # Build the HTTP POST request
     request = Net::HTTP::Post.new(uri)
-    request['Content-Type'] = 'application/json'
+    request["Content-Type"] = "application/json"
     request.body = {
       system_instruction: {
-        parts: [{ text: <<~PROMPT }]
+        parts: [ { text: <<~PROMPT } ]
             You are a senior software engineer and DevOps specialist with deep expertise in Kubernetes, container orchestration, cloud-native infrastructure, and software development across multiple languages and ecosystems.
 
             Core principles:
@@ -61,7 +61,7 @@ class GeminiService
     end
 
     result = JSON.parse(response.body)
-    
+
     # Return the text response or surface an error
     if response.is_a?(Net::HTTPSuccess)
       result.dig("candidates", 0, "content", "parts", 0, "text")

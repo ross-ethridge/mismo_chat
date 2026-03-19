@@ -1,6 +1,6 @@
-require 'net/http'
-require 'uri'
-require 'json'
+require "net/http"
+require "uri"
+require "json"
 
 class ImagenService
   SD_URL = "http://sd:8000/generate".freeze
@@ -10,7 +10,7 @@ class ImagenService
     uri = URI(SD_URL)
 
     request = Net::HTTP::Post.new(uri)
-    request['Content-Type'] = 'application/json'
+    request["Content-Type"] = "application/json"
     request.body = { prompt: prompt }.to_json
 
     response = Net::HTTP.start(uri.hostname, uri.port, read_timeout: 120) do |http|
@@ -18,8 +18,8 @@ class ImagenService
     end
 
     unless response.is_a?(Net::HTTPSuccess)
-      error = JSON.parse(response.body).dig('detail') rescue response.body
-      raise error || 'Unknown SD error'
+      error = JSON.parse(response.body).dig("detail") rescue response.body
+      raise error || "Unknown SD error"
     end
 
     response.body

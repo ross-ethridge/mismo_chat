@@ -1,13 +1,13 @@
 # app/services/claude_service.rb
-require 'net/http'
-require 'uri'
-require 'json'
+require "net/http"
+require "uri"
+require "json"
 
 class ClaudeService
   API_URL = "https://api.anthropic.com/v1/messages".freeze
   MODELS = {
-    'sonnet' => 'claude-sonnet-4-6',
-    'opus'   => 'claude-opus-4-6'
+    "sonnet" => "claude-sonnet-4-6",
+    "opus"   => "claude-opus-4-6"
   }.freeze
 
   SYSTEM_PROMPT = <<~PROMPT.freeze
@@ -33,8 +33,8 @@ class ClaudeService
     - Make the image_prompt detailed and optimized for Stable Diffusion image generation.
   PROMPT
 
-  def initialize(model: 'sonnet')
-    @model = MODELS.fetch(model, MODELS['sonnet'])
+  def initialize(model: "sonnet")
+    @model = MODELS.fetch(model, MODELS["sonnet"])
   end
 
   def call(messages)
@@ -42,14 +42,14 @@ class ClaudeService
 
     # Anthropic uses 'user'/'assistant'; map 'model' (Gemini role) → 'assistant'
     formatted_messages = messages.map do |msg|
-      role = msg.role == 'model' ? 'assistant' : 'user'
+      role = msg.role == "model" ? "assistant" : "user"
       { role: role, content: msg.content }
     end
 
     request = Net::HTTP::Post.new(uri)
-    request['Content-Type']    = 'application/json'
-    request['x-api-key']       = ENV['ANTHROPIC_API_KEY']
-    request['anthropic-version'] = '2023-06-01'
+    request["Content-Type"]    = "application/json"
+    request["x-api-key"]       = ENV["ANTHROPIC_API_KEY"]
+    request["anthropic-version"] = "2023-06-01"
     request.body = {
       model:      @model,
       max_tokens: 8096,

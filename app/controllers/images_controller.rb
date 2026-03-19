@@ -5,7 +5,7 @@ class ImagesController < ApplicationController
   def ai_prompt
     description = params[:description].to_s.strip
     provider    = params[:provider].to_s.downcase
-    provider    = 'claude' unless %w[claude gemini].include?(provider)
+    provider    = "claude" unless %w[claude gemini].include?(provider)
 
     return render json: { error: "Description required" }, status: 422 if description.blank?
 
