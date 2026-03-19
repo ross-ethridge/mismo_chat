@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel
 from diffusers import StableDiffusionPipeline
-from PIL import ImageDraw, ImageFont
+from PIL import ImageDraw, ImageFont, ImageFilter, ImageEnhance
 from typing import Optional
 
 app = FastAPI()
@@ -74,6 +74,39 @@ def generate(req: PromptRequest):
     image.save(buf, format="PNG")
     buf.seek(0)
 
+    return Response(content=buf.read(), media_type="image/png")
+
+
+@app.post("/generate/header")
+def generate_header(req: PromptRequest):
+    if not req.prompt.strip():
+        raise HTTPException(status_code=400, detail="Prompt cannot be empty")
+
+    with pipe_lock:
+        image = pipe(req.prompt.strip(), num_inference_steps=30).images[0]
+
+    # Upscale
+    image = image.resize((2048, 2048), resample=5)  # LANCZOS
+
+    # Grayscale to match dark UI theme
+    image = image.convert("L").convert("RGB")
+
+    # Denoise then sharpen
+    image = image.filter(ImageFilter.GaussianBlur(radius=0.6))
+    image = image.filter(ImageFilter.UnsharpMask(radius=2, percent=160, threshold=2))
+
+    # Boost contrast
+    image = ImageEnhance.Contrast(image).enhance(1.4)
+
+    # Crop middle section — tower + cables + some walkway
+    w, h = image.size
+    target_h = 500
+    top = int(h * 0.35)
+    image = image.crop((0, top, w, top + target_h))
+
+    buf = io.BytesIO()
+    image.save(buf, format="PNG")
+    buf.seek(0)
     return Response(content=buf.read(), media_type="image/png")
 
 
