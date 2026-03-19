@@ -31,42 +31,39 @@
   <div class="flex-grow bg-zinc-800 rounded-2xl shadow-xl flex flex-col overflow-hidden border border-zinc-700">
 
     <!-- Header -->
-    <header class="bg-zinc-800 px-6 py-4 border-b border-zinc-700 flex items-center flex-wrap gap-3">
-      <div class="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden shadow-sm">
-        <img src="/nyc_skyline.png" class="w-full h-full object-cover" alt="nyc">
-      </div>
-      <h2 class="m-0 text-lg font-semibold text-zinc-100 truncate">
+    <header class="nyc-bg px-6 py-4 border-b border-zinc-700 flex items-center flex-wrap gap-3">
+      <h2 class="m-0 text-lg font-semibold text-white truncate drop-shadow">
         <%= @conversation.title.present? ? @conversation.title : "New conversation" %>
       </h2>
       <!-- AI Model Toggle -->
       <div class="ml-auto flex items-center gap-2">
         <% if @ai_model == 'claude' %>
-          <div class="flex items-center gap-1 bg-zinc-700 rounded-full p-1 border border-zinc-600">
+          <div class="flex items-center gap-1 bg-black/30 rounded-full p-1 border border-white/20">
             <%= button_to session_path, method: :patch,
                   params: { claude_model: 'sonnet' },
-                  class: "px-3 py-1 rounded-full text-xs font-medium transition-colors #{@claude_model == 'sonnet' ? 'bg-zinc-500 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-100'}" do %>
+                  class: "px-3 py-1 rounded-full text-xs font-medium transition-colors #{@claude_model == 'sonnet' ? 'bg-white/20 text-white shadow-sm' : 'text-white/50 hover:text-white'}" do %>
               Sonnet
             <% end %>
             <%= button_to session_path, method: :patch,
                   params: { claude_model: 'opus' },
-                  class: "px-3 py-1 rounded-full text-xs font-medium transition-colors #{@claude_model == 'opus' ? 'bg-zinc-500 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-100'}" do %>
+                  class: "px-3 py-1 rounded-full text-xs font-medium transition-colors #{@claude_model == 'opus' ? 'bg-white/20 text-white shadow-sm' : 'text-white/50 hover:text-white'}" do %>
               Opus
             <% end %>
           </div>
         <% elsif @ai_model == 'gemini' %>
-          <div class="flex items-center gap-1 bg-zinc-700 rounded-full p-1 border border-zinc-600">
-            <span class="px-3 py-1 rounded-full text-xs font-medium bg-zinc-500 text-white shadow-sm">Flash</span>
+          <div class="flex items-center gap-1 bg-black/30 rounded-full p-1 border border-white/20">
+            <span class="px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white shadow-sm">Flash</span>
           </div>
         <% end %>
-        <div class="flex items-center gap-1 bg-zinc-700 rounded-full p-1 border border-zinc-600">
+        <div class="flex items-center gap-1 bg-black/30 rounded-full p-1 border border-white/20">
           <%= button_to session_path, method: :patch,
                 params: { ai_model: 'gemini' },
-                class: "px-3 py-1 rounded-full text-sm font-medium transition-colors #{@ai_model == 'gemini' ? 'nyc-bg text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-100'}" do %>
+                class: "px-3 py-1 rounded-full text-sm font-medium transition-colors #{@ai_model == 'gemini' ? 'bg-white/20 text-white shadow-sm' : 'text-white/50 hover:text-white'}" do %>
             Gemini
           <% end %>
           <%= button_to session_path, method: :patch,
                 params: { ai_model: 'claude' },
-                class: "px-3 py-1 rounded-full text-sm font-medium transition-colors #{@ai_model == 'claude' ? 'nyc-bg text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-100'}" do %>
+                class: "px-3 py-1 rounded-full text-sm font-medium transition-colors #{@ai_model == 'claude' ? 'bg-white/20 text-white shadow-sm' : 'text-white/50 hover:text-white'}" do %>
             Claude
           <% end %>
         </div>
@@ -100,7 +97,7 @@
               </a>
             </div>
           <% else %>
-            <div class="max-w-[80%] px-4 py-3 text-[15px] leading-relaxed <%= msg.role == 'user' ? 'nyc-bg text-white rounded-2xl rounded-br-sm shadow-md' : 'bg-zinc-700 text-zinc-100 rounded-2xl rounded-bl-sm border border-zinc-600 shadow-sm prose-chat' %>">
+            <div class="max-w-[80%] px-4 py-3 text-[15px] leading-relaxed <%= msg.role == 'user' ? 'bg-black text-white rounded-2xl rounded-br-sm shadow-md' : 'bg-zinc-700 text-zinc-100 rounded-2xl rounded-bl-sm border border-zinc-600 shadow-sm prose-chat' %>">
               <% if msg.role == 'user' %>
                 <%= simple_format(msg.content) %>
               <% else %>
@@ -133,7 +130,7 @@
                         rows: 1,
                         id: "message-input" %>
 
-        <%= button_tag type: 'submit', class: "rounded-full w-10 h-10 flex items-center justify-center transition-colors flex-shrink-0 mb-0.5 overflow-hidden" do %>
+        <%= button_tag type: 'submit', class: "rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 mb-0.5 overflow-hidden border-2 border-zinc-500 hover:border-zinc-200 active:border-white active:scale-95 transition-all duration-150 cursor-pointer" do %>
           <img src="/bike_wheel.png" class="w-full h-full object-cover" alt="send">
         <% end %>
       <% end %>
