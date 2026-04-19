@@ -54,6 +54,20 @@
           <div class="flex items-center gap-1 bg-black/30 rounded-full p-1 border border-white/20">
             <span class="px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white shadow-sm">Flash</span>
           </div>
+        <% elsif @ai_model == 'ollama' && @ollama_models.any? %>
+          <div class="flex items-center gap-1 bg-black/30 rounded-full p-1 border border-white/20 max-w-xs overflow-x-auto">
+            <% @ollama_models.each do |model| %>
+              <%= button_to session_path, method: :patch,
+                    params: { ollama_model: model },
+                    class: "px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors #{@ollama_model == model ? 'bg-white/20 text-white shadow-sm' : 'text-white/50 hover:text-white'}" do %>
+                <%= model %>
+              <% end %>
+            <% end %>
+          </div>
+        <% elsif @ai_model == 'ollama' %>
+          <div class="flex items-center gap-1 bg-black/30 rounded-full p-1 border border-white/20">
+            <span class="px-3 py-1 rounded-full text-xs font-medium text-red-400">No models found</span>
+          </div>
         <% end %>
         <div class="flex items-center gap-1 bg-black/30 rounded-full p-1 border border-white/20">
           <%= button_to session_path, method: :patch,
@@ -65,6 +79,11 @@
                 params: { ai_model: 'claude' },
                 class: "px-3 py-1 rounded-full text-sm font-medium transition-colors #{@ai_model == 'claude' ? 'bg-white/20 text-white shadow-sm' : 'text-white/50 hover:text-white'}" do %>
             Claude
+          <% end %>
+          <%= button_to session_path, method: :patch,
+                params: { ai_model: 'ollama' },
+                class: "px-3 py-1 rounded-full text-sm font-medium transition-colors #{@ai_model == 'ollama' ? 'bg-white/20 text-white shadow-sm' : 'text-white/50 hover:text-white'}" do %>
+            Ollama
           <% end %>
         </div>
       </div>
@@ -115,10 +134,10 @@
       <%= form_with url: chats_path, local: true, id: "chat-form", class: "flex gap-2 items-end bg-zinc-700 border border-zinc-600 rounded-2xl p-1.5 focus-within:ring-2 focus-within:ring-zinc-400 focus-within:border-zinc-400 transition-all" do |f| %>
 
         <%
-          placeholder_name = if @ai_model == 'claude'
-            @claude_model.capitalize
-          else
-            @gemini_model.capitalize
+          placeholder_name = case @ai_model
+          when 'claude' then @claude_model.capitalize
+          when 'ollama' then (@ollama_model || "Ollama")
+          else @gemini_model.capitalize
           end
         %>
         <%= f.text_area :content,

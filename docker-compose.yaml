@@ -34,7 +34,7 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - "3000:3000"
-    # This mounts your local code into the container so you don't have to 
+    # This mounts your local code into the container so you don't have to
     # rebuild the container every time you change a Ruby file!
     volumes:
       - .:/app
@@ -44,6 +44,8 @@ services:
     # Override the DB_HOST to point to the Postgres container
     environment:
       - DB_HOST=db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - db
       - sd

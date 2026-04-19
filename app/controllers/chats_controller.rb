@@ -8,6 +8,8 @@ class ChatsController < ApplicationController
     @claude_model = session[:claude_model] || "sonnet"
     @gemini_model = "flash"
     session[:gemini_model] = "flash"
+    @ollama_models = OllamaService.available_models
+    @ollama_model  = session[:ollama_model].presence || @ollama_models.first
   end
 
   def create
@@ -22,10 +24,13 @@ class ChatsController < ApplicationController
     end
 
     history = @conversation.messages.order(:created_at).to_a
-    service = if session[:ai_model] == "claude"
-                ClaudeService.new(model: session[:claude_model] || "sonnet")
+    service = case session[:ai_model]
+    when "claude"
+      ClaudeService.new(model: session[:claude_model] || "sonnet")
+    when "ollama"
+      OllamaService.new(model: session[:ollama_model].presence || "llama3.2")
     else
-                GeminiService.new(model: "flash")
+      GeminiService.new(model: "flash")
     end
     ai_response = service.call(history)
 
