@@ -1,6 +1,6 @@
 # Mismo Chat
 
-A Rails chat app tuned for software engineering and DevOps questions, with support for Google Gemini and Anthropic Claude, and a local Stable Diffusion image generator running on your GPU.
+A Rails chat app tuned for software engineering and DevOps questions, with support for Google Gemini, Anthropic Claude, local Ollama models, and a local Stable Diffusion image generator running on your GPU.
 
 ![Chat](docs/screenshots/chat.png)
 
@@ -10,7 +10,8 @@ A Rails chat app tuned for software engineering and DevOps questions, with suppo
 - PostgreSQL
 - Google Gemini 3.1 Flash Lite Preview API (chat)
 - Anthropic Claude API — Sonnet 4.6 or Opus 4.6 (chat)
-- Stable Diffusion 1.5 via local FastAPI/PyTorch service (image generation)
+- Ollama — any locally installed model via `http://host.docker.internal:11434` (chat)
+- Stable Diffusion XL via local FastAPI/PyTorch service (image generation)
 - Docker / Docker Compose
 
 ## Requirements
@@ -20,6 +21,7 @@ A Rails chat app tuned for software engineering and DevOps questions, with suppo
 - A [Google AI Studio](https://aistudio.google.com/) API key (Free Tier)
 - An [Anthropic](https://console.anthropic.com/) API key (optional — only needed if you want to use Claude)
 - A [HuggingFace](https://huggingface.co/) account and API token (Free Tier, just so you can download Stable Diffusion)
+- [Ollama](https://ollama.com/) installed and running on the host (optional — only needed for local model support)
 
 ### NVIDIA Container Toolkit (WSL2 / Linux)
 
@@ -72,7 +74,7 @@ This will:
 
 **3. Wait for Stable Diffusion to be ready:**
 
-On first run, the SD service downloads the model weights (~4GB from HuggingFace):
+On first run, the SD service downloads the SDXL model weights (~7GB from HuggingFace):
 
 ```bash
 docker compose logs -f sd
@@ -90,7 +92,7 @@ Talk to Google Gemini or Anthropic Claude. Both models are configured as a senio
 
 The full conversation history is sent with each request so the model has context. Type your message in the input box — it supports multiple lines (Enter for new line) and auto-resizes as you type.
 
-Use the toggle in the chat header to switch between Gemini and Claude at any time.
+Use the toggle in the chat header to switch between Gemini, Claude, and Ollama at any time.
 
 **Gemini** runs on the [free tier of Google AI Studio](https://aistudio.google.com/) — no billing required. Uses `gemini-3.1-flash-lite-preview`.
 
@@ -98,15 +100,26 @@ Use the toggle in the chat header to switch between Gemini and Claude at any tim
 - **Sonnet 4.6** — fast and capable (default)
 - **Opus 4.6** — most capable, slower
 
+**Ollama** connects to a locally running Ollama instance on the host machine at `http://host.docker.internal:11434`. Any models you have pulled with `ollama pull <model>` will appear in the model selector automatically. No API key required.
+
+```bash
+ollama pull llama3.2      # example — pull any model you want
+```
+
+You can override the Ollama host via the `OLLAMA_HOST` environment variable if your instance runs elsewhere.
+
 ### Conversations
 
 Each chat is saved as a named conversation. The sidebar lists all past conversations; click any to resume it, or use **+ New Chat** to start fresh. Conversations are auto-titled from the first message and can be deleted individually.
 
 ### Inline image generation from chat
 
-You can ask either model to generate an image directly in the chat (e.g. "draw me a sunset over the ocean"). The model returns a structured image prompt, which is automatically sent to the local Stable Diffusion service. The resulting image appears inline in the conversation — nothing is sent to any external image API.
+You can ask any model to generate an image directly in the chat. The model returns a structured image prompt, which is enhanced by the active AI provider and sent to the local Stable Diffusion XL service. The resulting image appears inline in the conversation — nothing is sent to any external image API.
 
-Images generated from chat are automatically styled as vintage polaroid photos — faded colors, film grain, white border, and soft focus.
+You can include size hints in your request and the model will use the appropriate dimensions:
+- `iphone wallpaper` / `portrait` / `phone` → 768×1344
+- `landscape` / `widescreen` / `16:9` → 1344×768
+- `square` / `1:1` → 1024×1024
 
 ### Standalone image generator
 
