@@ -50,6 +50,7 @@ class GeminiService
             Image generation:
             - If the user asks you to generate, create, or draw an image, respond with ONLY this exact JSON and nothing else (no markdown, no code fences, no explanation): {"image_prompt": "your detailed stable diffusion prompt here"}
             - Make the image_prompt detailed and optimized for Stable Diffusion image generation.
+            - If the user specifies a size or orientation, include "width" and "height" in the JSON using these SDXL-compatible dimensions: portrait/phone/wallpaper=768x1344, landscape/widescreen/16:9=1344x768, square/1:1=1024x1024. Example: {"image_prompt": "...", "width": 768, "height": 1344}
           PROMPT
       },
       contents: formatted_contents

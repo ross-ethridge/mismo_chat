@@ -34,11 +34,18 @@ class ChatsController < ApplicationController
     end
     ai_response = service.call(history)
 
-    if (image_prompt = extract_image_prompt(ai_response))
+    if (image_data_from_ai = extract_image_data(ai_response))
       begin
-        image_bytes = ImagenService.new.call(image_prompt)
+        provider = session[:ai_model] == "claude" ? "claude" : "gemini"
+        image_prompt   = image_data_from_ai[:prompt]
+        enhanced_prompt = PromptEnhancerService.new(provider: provider).call(image_prompt)
+        image_bytes = ImagenService.new.call(
+          enhanced_prompt,
+          width: image_data_from_ai[:width],
+          height: image_data_from_ai[:height]
+        )
         image_data  = Base64.strict_encode64(image_bytes)
-        Message.create!(role: "model", content: "[Image: #{image_prompt}]", image_data: image_data, conversation: @conversation)
+        Message.create!(role: "model", content: "[Image: #{enhanced_prompt}]", image_data: image_data, conversation: @conversation)
       rescue => e
         Message.create!(role: "model", content: "I tried to generate an image but the image service returned an error: #{e.message}", conversation: @conversation)
       end
@@ -51,9 +58,11 @@ class ChatsController < ApplicationController
 
   private
 
-  def extract_image_prompt(response)
-    parsed = JSON.parse(response.to_s.strip)
-    parsed["image_prompt"] if parsed.is_a?(Hash) && parsed.key?("image_prompt")
+  def extract_image_data(response)
+    cleaned = response.to_s.strip.gsub(/\A```(?:json)?\s*|\s*```\z/, "")
+    parsed = JSON.parse(cleaned)
+    return nil unless parsed.is_a?(Hash) && parsed.key?("image_prompt")
+    { prompt: parsed["image_prompt"], width: parsed["width"], height: parsed["height"] }
   rescue JSON::ParserError
     nil
   end

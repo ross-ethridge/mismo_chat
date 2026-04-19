@@ -6,12 +6,15 @@ class ImagenService
   SD_URL = "http://sd:8000/generate".freeze
 
   # Returns raw PNG bytes on success, raises RuntimeError on failure
-  def call(prompt)
+  def call(prompt, width: nil, height: nil)
     uri = URI(SD_URL)
 
     request = Net::HTTP::Post.new(uri)
     request["Content-Type"] = "application/json"
-    request.body = { prompt: prompt }.to_json
+    body = { prompt: prompt }
+    body[:width]  = width  if width
+    body[:height] = height if height
+    request.body = body.to_json
 
     response = Net::HTTP.start(uri.hostname, uri.port, read_timeout: 120) do |http|
       http.request(request)

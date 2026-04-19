@@ -4,42 +4,59 @@ import torch
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel
-from diffusers import StableDiffusionPipeline
+from diffusers import StableDiffusionXLPipeline, DPMSolverMultistepScheduler
 from PIL import ImageDraw, ImageFont, ImageFilter, ImageEnhance
 from typing import Optional
 
 app = FastAPI()
 pipe_lock = threading.Lock()
 
+DEFAULT_NEGATIVE = (
+    "blurry, low quality, deformed, ugly, bad anatomy, watermark, "
+    "text, signature, jpeg artifacts, oversaturated, distorted"
+)
+
 print("Loading model...")
-pipe = StableDiffusionPipeline.from_pretrained(
-    "stable-diffusion-v1-5/stable-diffusion-v1-5",
+pipe = StableDiffusionXLPipeline.from_pretrained(
+    "stabilityai/stable-diffusion-xl-base-1.0",
     torch_dtype=torch.float16,
-    safety_checker=None,
+    variant="fp16",
+    use_safetensors=True,
+)
+pipe.scheduler = DPMSolverMultistepScheduler.from_config(
+    pipe.scheduler.config, use_karras_sigmas=True
 )
 pipe = pipe.to("cuda")
+pipe.enable_attention_slicing()
 print("Model ready.")
 
 
 class PromptRequest(BaseModel):
     prompt: str
-    raw: bool = False
     text: Optional[str] = None
+    negative_prompt: Optional[str] = None
+    guidance_scale: float = 7.5
+    num_inference_steps: int = 30
+    width: Optional[int] = 1024
+    height: Optional[int] = 1024
 
-
-POLAROID_SUFFIX = (
-    ", polaroid photo, instant film, faded colors, slight vignette, "
-    "white border, film grain, vintage, overexposed, soft focus, retro"
-)
 
 @app.post("/generate")
 def generate(req: PromptRequest):
     if not req.prompt.strip():
         raise HTTPException(status_code=400, detail="Prompt cannot be empty")
 
-    prompt = req.prompt.strip() if req.raw else req.prompt.strip() + POLAROID_SUFFIX
+    prompt = req.prompt.strip()
+    negative_prompt = req.negative_prompt or DEFAULT_NEGATIVE
     with pipe_lock:
-        image = pipe(prompt, num_inference_steps=30).images[0]
+        image = pipe(
+            prompt,
+            negative_prompt=negative_prompt,
+            num_inference_steps=req.num_inference_steps,
+            guidance_scale=req.guidance_scale,
+            width=req.width,
+            height=req.height,
+        ).images[0]
 
     if req.text:
         from PIL import Image as PILImage
@@ -83,7 +100,12 @@ def generate_header(req: PromptRequest):
         raise HTTPException(status_code=400, detail="Prompt cannot be empty")
 
     with pipe_lock:
-        image = pipe(req.prompt.strip(), num_inference_steps=30).images[0]
+        image = pipe(
+            req.prompt.strip(),
+            negative_prompt=DEFAULT_NEGATIVE,
+            num_inference_steps=30,
+            guidance_scale=7.5,
+        ).images[0]
 
     # Upscale
     image = image.resize((2048, 2048), resample=5)  # LANCZOS
