@@ -36,7 +36,24 @@
         <%= @conversation.title.present? ? @conversation.title : "New conversation" %>
       </h2>
       <!-- AI Model Toggle -->
-      <div class="ml-auto flex items-center gap-2">
+      <div class="ml-auto flex flex-col items-end gap-2">
+        <div class="flex items-center gap-1 bg-black/30 rounded-full p-1 border border-white/20">
+          <%= button_to session_path, method: :patch,
+                params: { ai_model: 'gemini' },
+                class: "px-3 py-1 rounded-full text-sm font-medium transition-colors #{@ai_model == 'gemini' ? 'bg-white/20 text-white shadow-sm' : 'text-white/50 hover:text-white'}" do %>
+            Gemini
+          <% end %>
+          <%= button_to session_path, method: :patch,
+                params: { ai_model: 'claude' },
+                class: "px-3 py-1 rounded-full text-sm font-medium transition-colors #{@ai_model == 'claude' ? 'bg-white/20 text-white shadow-sm' : 'text-white/50 hover:text-white'}" do %>
+            Claude
+          <% end %>
+          <%= button_to session_path, method: :patch,
+                params: { ai_model: 'ollama' },
+                class: "px-3 py-1 rounded-full text-sm font-medium transition-colors #{@ai_model == 'ollama' ? 'bg-white/20 text-white shadow-sm' : 'text-white/50 hover:text-white'}" do %>
+            Ollama
+          <% end %>
+        </div>
         <% if @ai_model == 'claude' %>
           <div class="flex items-center gap-1 bg-black/30 rounded-full p-1 border border-white/20">
             <%= button_to session_path, method: :patch,
@@ -69,23 +86,6 @@
             <span class="px-3 py-1 rounded-full text-xs font-medium text-red-400">No models found</span>
           </div>
         <% end %>
-        <div class="flex items-center gap-1 bg-black/30 rounded-full p-1 border border-white/20">
-          <%= button_to session_path, method: :patch,
-                params: { ai_model: 'gemini' },
-                class: "px-3 py-1 rounded-full text-sm font-medium transition-colors #{@ai_model == 'gemini' ? 'bg-white/20 text-white shadow-sm' : 'text-white/50 hover:text-white'}" do %>
-            Gemini
-          <% end %>
-          <%= button_to session_path, method: :patch,
-                params: { ai_model: 'claude' },
-                class: "px-3 py-1 rounded-full text-sm font-medium transition-colors #{@ai_model == 'claude' ? 'bg-white/20 text-white shadow-sm' : 'text-white/50 hover:text-white'}" do %>
-            Claude
-          <% end %>
-          <%= button_to session_path, method: :patch,
-                params: { ai_model: 'ollama' },
-                class: "px-3 py-1 rounded-full text-sm font-medium transition-colors #{@ai_model == 'ollama' ? 'bg-white/20 text-white shadow-sm' : 'text-white/50 hover:text-white'}" do %>
-            Ollama
-          <% end %>
-        </div>
       </div>
     </header>
 

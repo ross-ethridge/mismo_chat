@@ -39,4 +39,5 @@
 
 # Ignore claude files
 **CLAUDE.md
+/screenshots/*
 
