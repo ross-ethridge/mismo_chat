@@ -4,7 +4,7 @@ import torch
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel
-from diffusers import StableDiffusionXLPipeline, DPMSolverMultistepScheduler
+from diffusers import StableDiffusion3Pipeline
 from PIL import ImageDraw, ImageFont, ImageFilter, ImageEnhance
 from typing import Optional
 
@@ -17,17 +17,13 @@ DEFAULT_NEGATIVE = (
 )
 
 print("Loading model...")
-pipe = StableDiffusionXLPipeline.from_pretrained(
-    "stabilityai/stable-diffusion-xl-base-1.0",
-    torch_dtype=torch.float16,
-    variant="fp16",
-    use_safetensors=True,
-)
-pipe.scheduler = DPMSolverMultistepScheduler.from_config(
-    pipe.scheduler.config, use_karras_sigmas=True
+pipe = StableDiffusion3Pipeline.from_pretrained(
+    "stabilityai/stable-diffusion-3.5-medium",
+    torch_dtype=torch.bfloat16,
 )
 pipe = pipe.to("cuda")
-pipe.enable_attention_slicing()
+pipe.enable_vae_slicing()
+pipe.enable_vae_tiling()
 print("Model ready.")
 
 
@@ -35,10 +31,10 @@ class PromptRequest(BaseModel):
     prompt: str
     text: Optional[str] = None
     negative_prompt: Optional[str] = None
-    guidance_scale: float = 7.5
-    num_inference_steps: int = 30
-    width: Optional[int] = 1024
-    height: Optional[int] = 1024
+    guidance_scale: float = 4.5
+    num_inference_steps: int = 28
+    width: Optional[int] = None
+    height: Optional[int] = None
 
 
 @app.post("/generate")
@@ -57,6 +53,8 @@ def generate(req: PromptRequest):
             width=req.width,
             height=req.height,
         ).images[0]
+
+    torch.cuda.empty_cache()
 
     if req.text:
         from PIL import Image as PILImage

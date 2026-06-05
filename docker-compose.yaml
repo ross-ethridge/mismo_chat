@@ -17,6 +17,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
     volumes:
       - ./sd/app.py:/app/app.py
       - hf_cache:/root/.cache/huggingface
