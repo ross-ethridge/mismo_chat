@@ -1,6 +1,9 @@
 import io
+import logging
 import threading
 import torch
+
+logging.getLogger("transformers").setLevel(logging.ERROR)
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel
@@ -21,9 +24,7 @@ pipe = StableDiffusion3Pipeline.from_pretrained(
     "stabilityai/stable-diffusion-3.5-medium",
     torch_dtype=torch.bfloat16,
 )
-pipe = pipe.to("cuda")
-pipe.enable_vae_slicing()
-pipe.enable_vae_tiling()
+pipe.enable_sequential_cpu_offload()
 print("Model ready.")
 
 
